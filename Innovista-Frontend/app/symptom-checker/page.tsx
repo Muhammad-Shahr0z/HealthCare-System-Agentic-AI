@@ -295,123 +295,119 @@ export default function SymptomCheckerPage() {
             </div>
 
             {/* Chat Interface */}
-            <div className="lg:col-span-3">
-              <Card className="border-0 shadow-lg h-[600px] flex flex-col">
-                <CardHeader className="border-b">
-                  <CardTitle className="flex items-center">
-                    <Bot className="mr-2 h-5 w-5 text-blue-600" />
-                    Health Assistant
-                  </CardTitle>
-                  <CardDescription>Chat with our AI to understand your symptoms</CardDescription>
-                </CardHeader>
+            {/* Alternative Solution - Simple div with overflow */}
+<div className="lg:col-span-3">
+  <Card className="border-0 shadow-lg h-[600px] flex flex-col">
+    <CardHeader className="border-b">
+      <CardTitle className="flex items-center">
+        <Bot className="mr-2 h-5 w-5 text-blue-600" />
+        Health Assistant
+      </CardTitle>
+      <CardDescription>Chat with our AI to understand your symptoms</CardDescription>
+    </CardHeader>
 
-                {/* Messages */}
-                <ScrollArea className="flex-1 p-4">
-                  <div className="space-y-4">
-                    {messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
-                      >
-                        <div className={`flex items-start space-x-2 max-w-[80%]`}>
-                          {message.type === "bot" && (
-                            <Avatar className="h-8 w-8">
-                              <AvatarFallback className="bg-blue-100">
-                                <Bot className="h-4 w-4 text-blue-600" />
-                              </AvatarFallback>
-                            </Avatar>
-                          )}
-                          <div
-                            className={`rounded-lg p-3 ${
-                              message.type === "user" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-900"
-                            }`}
-                          >
-                            <p className="text-sm">{message.content}</p>
-                            {message.suggestions && (
-                              <div className="mt-3 space-y-2">
-                                <Separator className="bg-gray-300" />
-                                <p className="text-xs font-medium">Recommendations:</p>
-                                <ul className="text-xs space-y-1">
-                                  {message.suggestions.map((suggestion, index) => (
-                                    <li key={index} className="flex items-start">
-                                      <span className="mr-2">•</span>
-                                      {suggestion}
-                                    </li>
-                                  ))}
-                                </ul>
-                                {message.severity === "high" && (
-                                  <div className="flex items-center mt-2 p-2 bg-red-50 rounded border-l-2 border-red-500">
-                                    <AlertTriangle className="h-4 w-4 text-red-500 mr-2" />
-                                    <span className="text-xs text-red-700 font-medium">
-                                      Consider seeking immediate medical attention
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                            <p className="text-xs opacity-70 mt-2">
-                              {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                            </p>
-                          </div>
-                          {message.type === "user" && (
-                            <Avatar className="h-8 w-8">
-                              <AvatarFallback className="bg-green-100">
-                                <User className="h-4 w-4 text-green-600" />
-                              </AvatarFallback>
-                            </Avatar>
-                          )}
-                        </div>
-                      </div>
+    {/* Simple div with overflow instead of ScrollArea */}
+    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {messages.map((message) => (
+        <div
+          key={message.id}
+          className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
+        >
+          <div className={`flex items-start space-x-2 max-w-[80%] ${message.type === "user" ? "flex-row-reverse" : ""}`}>
+            <Avatar className="h-8 w-8 flex-shrink-0">
+              <AvatarFallback className={message.type === "bot" ? "bg-blue-100" : "bg-green-100"}>
+                {message.type === "bot" ? (
+                  <Bot className="h-4 w-4 text-blue-600" />
+                ) : (
+                  <User className="h-4 w-4 text-green-600" />
+                )}
+              </AvatarFallback>
+            </Avatar>
+            <div
+              className={`rounded-lg p-3 ${
+                message.type === "user" 
+                  ? "bg-blue-600 text-white rounded-br-none" 
+                  : "bg-gray-100 text-gray-900 rounded-bl-none"
+              }`}
+            >
+              <p className="text-sm break-words">{message.content}</p>
+              {message.suggestions && (
+                <div className="mt-3 space-y-2">
+                  <Separator className={message.type === "user" ? "bg-blue-400" : "bg-gray-300"} />
+                  <p className="text-xs font-medium">Recommendations:</p>
+                  <ul className="text-xs space-y-1">
+                    {message.suggestions.map((suggestion, index) => (
+                      <li key={index} className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span className="break-words">{suggestion}</span>
+                      </li>
                     ))}
-                    {isTyping && (
-                      <div className="flex justify-start">
-                        <div className="flex items-start space-x-2">
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback className="bg-blue-100">
-                              <Bot className="h-4 w-4 text-blue-600" />
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="bg-gray-100 rounded-lg p-3">
-                            <div className="flex space-x-1">
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                              <div
-                                className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                                style={{ animationDelay: "0.1s" }}
-                              ></div>
-                              <div
-                                className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                                style={{ animationDelay: "0.2s" }}
-                              ></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    <div ref={messagesEndRef} />
-                  </div>
-                </ScrollArea>
-
-                {/* Input */}
-                <div className="border-t p-4">
-                  <div className="flex space-x-2">
-                    <Input
-                      placeholder="Describe your symptoms..."
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                      className="flex-1"
-                    />
-                    <Button
-                      onClick={handleSendMessage}
-                      disabled={!inputValue.trim() || isTyping}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  </ul>
+                  {message.severity === "high" && (
+                    <div className="flex items-center mt-2 p-2 bg-red-50 rounded border-l-2 border-red-500">
+                      <AlertTriangle className="h-4 w-4 text-red-500 mr-2 flex-shrink-0" />
+                      <span className="text-xs text-red-700 font-medium">
+                        Consider seeking immediate medical attention
+                      </span>
+                    </div>
+                  )}
                 </div>
-              </Card>
+              )}
+              <p className={`text-xs opacity-70 mt-2 ${message.type === "user" ? "text-blue-200" : "text-gray-500"}`}>
+                {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </p>
             </div>
+          </div>
+        </div>
+      ))}
+      {isTyping && (
+        <div className="flex justify-start">
+          <div className="flex items-start space-x-2">
+            <Avatar className="h-8 w-8">
+              <AvatarFallback className="bg-blue-100">
+                <Bot className="h-4 w-4 text-blue-600" />
+              </AvatarFallback>
+            </Avatar>
+            <div className="bg-gray-100 rounded-lg p-3">
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                <div
+                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.1s" }}
+                ></div>
+                <div
+                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.2s" }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      <div ref={messagesEndRef} />
+    </div>
+
+    {/* Input */}
+    <div className="border-t p-4">
+      <div className="flex space-x-2">
+        <Input
+          placeholder="Describe your symptoms..."
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+          className="flex-1"
+        />
+        <Button
+          onClick={handleSendMessage}
+          disabled={!inputValue.trim() || isTyping}
+          className="bg-blue-600 hover:bg-blue-700"
+        >
+          <Send className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  </Card>
+</div>
           </div>
 
           {/* Emergency Notice */}
